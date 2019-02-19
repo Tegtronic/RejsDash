@@ -10,6 +10,9 @@
 #include "MaxxECU.h"
 #include "NeoPixelBar.h"
 
+#define SHIFTLIGHT_THRESHOLD 4000
+#define SHIFTLIGHT_STEP_PER_LED 300
+
 static const byte MCP2515_CS  = 11 ; // CS input of MCP2515, adapt to your design
 static const byte MCP2515_INT = 7 ; // INT output of MCP2515, adapt to your design
 static const uint32_t QUARTZ_FREQUENCY = 16000000 ; // 16 MHz
@@ -44,7 +47,7 @@ void setup() {
 	MAX6954::init();
 	MAX6954::welcome();
 
-	NeoPixelBar::init();
+	NeoPixelBar::init(SHIFTLIGHT_THRESHOLD, SHIFTLIGHT_STEP_PER_LED);
 	NeoPixelBar::welcome();
 
 	delay(100);
