@@ -63,14 +63,12 @@
 #define NUM_8_W_DOT 0x88
 #define NUM_9_W_DOT 0x89
 
-enum SegmentChunk
-{
+enum SegmentChunk{
 	LEFT, RIGHT               // Selects which side of the gear digit to show a value
 };
 
 
-namespace MAX6954
-{
+namespace MAX6954{
 	void init();
 	void welcome();
 	void outputNumericalDualP(SegmentChunk SegChunk, float Val, uint8_t NoOfDecimals);

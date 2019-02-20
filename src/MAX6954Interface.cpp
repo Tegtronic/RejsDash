@@ -16,8 +16,7 @@ void MAX6954::init(){
 	MAX6954::WriteRegister(CMD_Configuration, 0x0D);            // Exit shutdown mode  
 }
 
-void MAX6954::welcome()
-{
+void MAX6954::welcome(){
 	MAX6954::WriteRegister(CMD_Digit0DualP, 'R');
 	MAX6954::WriteRegister(CMD_Digit1DualP, 'E');
 	MAX6954::WriteRegister(CMD_Digit2DualP, 'J');

@@ -5,14 +5,18 @@
 #include <CANMessage.h>
 #include <MCP2515ReceiveFilters.h>
 
+#include "DTA.h"
 #include "GearDigit.h"
 #include "MAX6954Interface.h"
 #include "NeoPixelBar.h"
 
+#define SHIFTLIGHT_THRESHOLD 4000
+#define SHIFTLIGHT_STEP_PER_LED 300
+
 static const byte MCP2515_CS  = 11 ; // CS input of MCP2515, adapt to your design
 static const byte MCP2515_INT = 7 ; // INT output of MCP2515, adapt to your design
 static const uint32_t QUARTZ_FREQUENCY = 16000000 ; // 16 MHz
-static const uint32_t CAN_BAUDRATE = 500000;
+static const uint32_t CAN_BAUDRATE = 1000000;
 
 ACAN2515 can (MCP2515_CS, SPI, MCP2515_INT);
 
@@ -43,7 +47,7 @@ void setup() {
 	MAX6954::init();
 	MAX6954::welcome();
 
-	NeoPixelBar::init();
+	NeoPixelBar::init(SHIFTLIGHT_THRESHOLD, SHIFTLIGHT_STEP_PER_LED);
 	NeoPixelBar::welcome();
 
 	delay(100);
@@ -51,19 +55,19 @@ void setup() {
 	/////////////////////////////////////////// MCP2515 Init /////////////////////////////////////////// 
 	ACAN2515Settings settings(QUARTZ_FREQUENCY , CAN_BAUDRATE);
 	settings.mRequestedMode = ACAN2515Settings :: NormalMode;
-	const ACAN2515Mask rxm0 = standard2515Mask (0x7E0 , 0, 0) ;
+	const ACAN2515Mask rxm0 = extended2515Mask (0x1FFFFFF0) ;
 	const ACAN2515AcceptanceFilter filter [] = 
-	{standard2515Filter (0x520 , 0, 0), receive0};
+	{extended2515Filter (0x2000), receive0};
 	const uint16_t errorCode = can.begin (settings ,
-	[] { can.isr () ; },
-	rxm0 , // Value set to RXM0 register
-	filter , // The filter array
-	1) ; // Filter array size
+										[] { can.isr () ; },
+										rxm0 , // Value set to RXM0 register
+										filter , // The filter array
+										1) ; // Filter array size
 }
 
 void loop() {
-	Maxx::Signals myMaxx;             // Struct containing values from MaxxECU
-	Maxx::initStruct(myMaxx);         // Set all initial values to 0
+	DTA::Signals myDTA;             // Struct containing values from MaxxECU
+	DTA::initStruct(myDTA);         // Set all initial values to 0
 
 	// Only update display when value has changed so store which value is currently showing here
 	byte gearShown = 0;
@@ -78,21 +82,21 @@ void loop() {
 		if (can.available ()) {
 			can.receive (frame);
 			
-			DTA::processFrame(frame, myMaxx);
+			DTA::processFrame(frame, myDTA);
 			
-			if(myMaxx.Gear != gearShown){
-				GearDigit::setOutput(myMaxx.Gear);
-				gearShown = myMaxx.Gear;
+			if(myDTA.Gear != gearShown){
+				GearDigit::setOutput(myDTA.Gear);
+				gearShown = myDTA.Gear;
 			}
 			
 			/*
 	* Example use of warning system. If Coolant level exceeds warning limit (in this case 105 degrees) then the value will be written to plane 0 and plane 1 will be cleared except identifier
 	* letter which causes a blinking effect on the value in the dash to attract attention from the driver
 	*/
-			if(myMaxx.CoolantTemp != coolantTempShown){
+			if(myDTA.WaterTemp != coolantTempShown){
 
-				if(myMaxx.CoolantTemp * 0.1 > 90){
-					MAX6954::outputNumericalPlaneP0(RIGHT, myMaxx.CoolantTemp*0.1, 0);
+				if(myDTA.WaterTemp* 0.1 > 90){
+					MAX6954::outputNumericalPlaneP0(RIGHT, myDTA.WaterTemp*0.1, 0);
 					MAX6954::WriteRegister(CMD_Digit4PlaneP0, 'W');                             // Set ID Letter on Plane 0
 					MAX6954::WriteRegister(CMD_Digit4PlaneP1, 'W');                             // Set ID Letter on Plane 1
 					MAX6954::WriteRegister(CMD_Digit5PlaneP1, 0x10);                            // Clear segment 6 on Plane 1
@@ -100,22 +104,22 @@ void loop() {
 					MAX6954::WriteRegister(CMD_Digit7PlaneP1, 0x10);                            // Clear segment 8 on Plane 1
 				}
 				else{
-					MAX6954::outputNumericalDualP(RIGHT, myMaxx.CoolantTemp*0.1, 0);          // Write coolant value to right side of the dash. Make sure to apply the appropriate factor for the value. 
+					MAX6954::outputNumericalDualP(RIGHT, myDTA.WaterTemp*0.1, 0);          // Write coolant value to right side of the dash. Make sure to apply the appropriate factor for the value. 
 					MAX6954::WriteRegister(CMD_Digit4DualP, 'W');                             // Set letter on empty segment after writing value to provide identifier (W=Water)
 				}
-				coolantTempShown = myMaxx.CoolantTemp;                                      // Save which value is showing so the display only needs to be updated on changes
+				coolantTempShown = myDTA.WaterTemp;                                      // Save which value is showing so the display only needs to be updated on changes
 			}
 			
-			if(myMaxx.UserAnalogInput1 != oilPressureShown){
-				MAX6954::outputNumericalDualP(LEFT, myMaxx.UserAnalogInput1*0.001, 1);
-				oilPressureShown = myMaxx.UserAnalogInput1;
+			if(myDTA.OilP != oilPressureShown){
+				MAX6954::outputNumericalDualP(LEFT, myDTA.OilP*0.001, 1);
+				oilPressureShown = myDTA.OilP;
 				MAX6954::WriteRegister(CMD_Digit0DualP, 'O');                           // Set letter on empty segment after writing value to provide identifier (OP=OilPressure)
 				MAX6954::WriteRegister(CMD_Digit1DualP, 'P');         
 			}
 
-			if(myMaxx.RPM != RPMShown){
+			if(myDTA.RPM != RPMShown){
 				//NeoPixelBar::leftToRightFill(myMaxx.RPM);
-				NeoPixelBar::sideFill(myMaxx.RPM);
+				NeoPixelBar::sideFill(myDTA.RPM);
 				//NeoPixelBar::sideFillShortStep(myMaxx.RPM);
 				//NeoPixelBar::shiftLight(myMaxx.RPM);
 			}
