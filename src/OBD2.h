@@ -46,6 +46,7 @@
 
 namespace OBD2{
 	bool requestIsPending();
+	void setRequestPending(bool cmd);
 	void requestPID(ACAN2515& myCAN, uint8_t TargetPID);
 	bool processFrame(float &val, byte &PID_ID, CANMessage &MyCANFrame);
 }

@@ -91,6 +91,7 @@ void loop() {
 
 		if (can.available ()) {
 			can.receive (MyCANFrame);
+			OBD2::setRequestPending(false);
 			if(MyCANFrame.data[1] == 0x41){
 				byte PID_ID = MyCANFrame.data[2];
 				

@@ -8,6 +8,11 @@ bool OBD2::requestIsPending(){
 	return RequestPending;
 }
 
+void OBD2::setRequestPending(bool cmd)
+{
+	RequestPending = cmd;
+}
+
 void OBD2::requestPID(ACAN2515& myCAN, uint8_t TargetPID){
 	CANMessage frame;
 	frame.id = 0x7DF;
