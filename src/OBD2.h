@@ -31,7 +31,7 @@
 #define PID_AmbientAirTemperature 0x46
 #define PID_EthanolFuelPercent 0x52
 #define PID_FuelRailAbsolutePressure 0x59
-#define PID_HybridBatterpackRemainingLife 0x5B
+#define PID_HybridBatteryPackRemainingLife 0x5B
 #define PID_EngineOilTemperature 0x5C
 #define PID_FuelInjectionTiming 0x5D
 #define PID_EngineFuelRate 0x5E

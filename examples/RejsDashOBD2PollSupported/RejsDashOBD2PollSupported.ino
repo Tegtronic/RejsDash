@@ -172,9 +172,9 @@ void loop() {
 					if(bitRead(MyCANFrame.data[3], 2)) Serial.println(F("0x46 Ambient Air Temp"));
 					if(bitRead(MyCANFrame.data[3], 1)) Serial.println(F("0x47 Absolute TPS B"));
 					if(bitRead(MyCANFrame.data[3], 0)) Serial.println(F("0x48 Absolute TPS C"));
-					if(bitRead(MyCANFrame.data[4], 7)) Serial.println(F("0x49 Absolute TPS D"));
-					if(bitRead(MyCANFrame.data[4], 6)) Serial.println(F("0x4A Absolute TPS E"));
-					if(bitRead(MyCANFrame.data[4], 5)) Serial.println(F("0x4B Absolute TPS F"));
+					if(bitRead(MyCANFrame.data[4], 7)) Serial.println(F("0x49 Accelerator pedal position D"));
+					if(bitRead(MyCANFrame.data[4], 6)) Serial.println(F("0x4A Accelerator pedal position E"));
+					if(bitRead(MyCANFrame.data[4], 5)) Serial.println(F("0x4B Accelerator pedal position F"));
 					if(bitRead(MyCANFrame.data[4], 4)) Serial.println(F("0x4C Commanded throttle actuator"));
 					if(bitRead(MyCANFrame.data[4], 3)) Serial.println(F("0x4D Time run with MIL on"));
 					if(bitRead(MyCANFrame.data[4], 2)) Serial.println(F("0x4E Time since trouble codes cleared"));
