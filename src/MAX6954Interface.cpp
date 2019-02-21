@@ -552,10 +552,10 @@ void MAX6954::outputNumericalPlaneP1(SegmentChunk SegChunk, float Val, uint8_t N
 			case 3: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_3); break;
 			case 4: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_4); break;
 			case 5: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_5); break;
-			case 6: MAX6954::WriteRegister(CMD_Digit1DualP, NUM_6); break;
-			case 7: MAX6954::WriteRegister(CMD_Digit1DualP, NUM_7); break;
-			case 8: MAX6954::WriteRegister(CMD_Digit1DualP, NUM_8); break;
-			case 9: MAX6954::WriteRegister(CMD_Digit1DualP, NUM_9); break;
+			case 6: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_6); break;
+			case 7: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_7); break;
+			case 8: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_8); break;
+			case 9: MAX6954::WriteRegister(CMD_Digit1PlaneP1, NUM_9); break;
 			}
 		}
 		
