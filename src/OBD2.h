@@ -2,6 +2,8 @@
 #include <CANMessage.h>
 #include <arduino.h>
 
+#define REQUEST_TIMEOUT_MS 5000
+
 /*
 * https://en.wikipedia.org/wiki/OBD-II_PIDs
 */
@@ -45,7 +47,7 @@
 #define PID_Odometer 0xA6
 
 namespace OBD2{
-	bool requestIsPending();
+	bool requestIsPending(uint32_t CurrentTime);
 	void setRequestPending(bool cmd);
 	void requestPID(ACAN2515& myCAN, uint8_t TargetPID);
 	bool processFrame(float &val, byte &PID_ID, CANMessage &MyCANFrame);

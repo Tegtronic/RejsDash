@@ -1,10 +1,15 @@
 #include "OBD2.h"
 
 namespace{
-	bool RequestPending;  
+	bool RequestPending;
+	uint32_t RequestTimestamp;
 }
 
-bool OBD2::requestIsPending(){
+bool OBD2::requestIsPending(uint32_t CurrentTime){
+	if(RequestPending && (CurrentTime - RequestTimestamp) > REQUEST_TIMEOUT_MS){
+		RequestPending = false;
+		Serial.println(F("OBD2 Req timeout - Retrying..."));
+	}
 	return RequestPending;
 }
 
@@ -29,7 +34,10 @@ void OBD2::requestPID(ACAN2515& myCAN, uint8_t TargetPID){
 	if (!ok) {
 		Serial.println("CAN TX Error!");
 	}
-	else RequestPending = true;  
+	else{
+		RequestPending = true;
+		RequestTimestamp = millis();
+	}
 }
 
 /*

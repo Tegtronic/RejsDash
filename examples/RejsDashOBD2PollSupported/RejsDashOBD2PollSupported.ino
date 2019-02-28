@@ -87,7 +87,7 @@ void loop() {
 	
 	while(1){
 		delay(500);
-		if(!OBD2::requestIsPending())OBD2::requestPID(can, PIDArray[PIDArrayPtr]);
+		if(!OBD2::requestIsPending(millis()))OBD2::requestPID(can, PIDArray[PIDArrayPtr]);
 
 		if (can.available ()) {
 			can.receive (MyCANFrame);
